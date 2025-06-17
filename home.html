@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition Studio - Advanced AI Face Matching</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            
+            /* Dark Theme Colors */
+            --bg-color: #0a0a0a;
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --card-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-primary-rgb: 255, 255, 255; /* Added for rgba() compatibility */
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --shadow-base: rgba(0, 0, 0, 0.5);
+
+            /* Light Theme Colors (Default) */
+            --light-bg-color: #f0f4f8;
+            --light-card-bg: rgba(255, 255, 255, 0.9);
+            --light-card-border: rgba(0, 0, 0, 0.1);
+            --light-text-primary: #1e293b;
+            --light-text-primary-rgb: 30, 41, 59; /* Added for rgba() compatibility */
+            --light-text-secondary: #64748b;
+            --light-shadow-base: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Apply theme variables */
+        body.dark-theme {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+        }
+
+        body.light-theme {
+            background-color: var(--light-bg-color);
+            color: var(--light-text-primary);
+            
+            /* Overrides for Light Theme */
+            --bg-color: var(--light-bg-color);
+            --card-bg: var(--light-card-bg);
+            --card-border: var(--light-card-border);
+            --text-primary: var(--light-text-primary);
+            --text-primary-rgb: var(--light-text-primary-rgb); /* Ensure light theme RGB is used */
+            --text-secondary: var(--light-text-secondary);
+            --shadow-base: var(--light-shadow-base);
+            
+            background-image: none; /* Remove animated background for light theme */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-color); /* Default to dark theme for now */
+            color: var(--text-primary); /* Default to dark theme for now */
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { 
+                background-position: 0% 0%, 100% 100%, 50% 50%;
+            }
+            33% { 
+                background-position: 100% 0%, 0% 100%, 50% 50%;
+            }
+            66% { 
+                background-position: 0% 100%, 100% 0%, 50% 50%;
+            }
+        }
+
+        .floating-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        .particle:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 15s; }
+        .particle:nth-child(2) { left: 20%; animation-delay: -5s; animation-duration: 18s; }
+        .particle:nth-child(3) { left: 30%; animation-delay: -10s; animation-duration: 22s; }
+        .particle:nth-child(4) { left: 40%; animation-delay: -15s; animation-duration: 16s; }
+        .particle:nth-child(5) { left: 50%; animation-delay: -2s; animation-duration: 20s; }
+        .particle:nth-child(6) { left: 60%; animation-delay: -7s; animation-duration: 25s; }
+        .particle:nth-child(7) { left: 70%; animation-delay: -12s; animation-duration: 17s; }
+        .particle:nth-child(8) { left: 80%; animation-delay: -17s; animation-duration: 23s; }
+        .particle:nth-child(9) { left: 90%; animation-delay: -4s; animation-duration: 19s; }
+
+        @keyframes float {
+            0% { 
+                transform: translateY(100vh) rotate(0deg); 
+                opacity: 0; 
+            }
+            10% { 
+                opacity: 1; 
+            }
+            90% { 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translateY(-100px) rotate(360deg); 
+                opacity: 0; 
+            }
+        }
+
+        /* Entrance Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideInFromBottom {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animation Classes */
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .animate-fade-in-down {
+            animation: fadeInDown 0.8s ease-out forwards;
+        }
+
+        .animate-fade-in-left {
+            animation: fadeInLeft 0.8s ease-out forwards;
+        }
+
+        .animate-fade-in-right {
+            animation: fadeInRight 0.8s ease-out forwards;
+        }
+
+        .animate-scale-in {
+            animation: scaleIn 0.8s ease-out forwards;
+        }
+
+        .animate-slide-in-bottom {
+            animation: slideInFromBottom 0.8s ease-out forwards;
+        }
+
+        /* Staggered Animation Delays */
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+        .stagger-5 { animation-delay: 0.5s; }
+        .stagger-6 { animation-delay: 0.6s; }
+
+        /* Hover Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(102, 126, 234, 0.6); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Interactive Hover Effects */
+        .feature-badge:hover {
+            animation: pulse 0.6s ease-in-out;
+            transform: translateY(-3px);
+        }
+
+        .animation-card:hover {
+            animation: glow 2s ease-in-out infinite;
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        .step-card:hover {
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        .try-now-btn:hover {
+            animation: pulse 0.6s ease-in-out;
+            transform: scale(1.05);
+        }
+
+        .floating-try-btn:hover {
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        /* Continuous Animations */
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .rotating-icon {
+            animation: rotate 20s linear infinite;
+        }
+
+        .pulse-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Loading Animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+            transition: width 0.3s ease;
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 2rem;
+            background: transparent; /* Ensure hero section does not block animated background */
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 800px;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--text-primary), rgba(var(--text-primary-rgb), 0.7));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            font-weight: 400;
+        }
+
+        .hero-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .feature-badge {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .feature-badge:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Animated Intro Section */
+        .intro-section {
+            padding: 6rem 2rem;
+            position: relative;
+            background: var(--card-bg); /* Use card background for glassmorphism */
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--card-border);
+            border-bottom: 1px solid var(--card-border);
+            margin-top: 4rem;
+            margin-bottom: 4rem;
+            border-radius: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: var(--shadow-base) 0px 20px 40px -12px;
+        }
+
+        .intro-container {
+            max-width: 100%; /* Adjust to fit padded section */
+            margin: 0 auto;
+        }
+
+        .intro-title {
+            text-align: center;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 4rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .intro-animation {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+
+        .animation-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 2rem;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .animation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .animation-card:hover::before {
+            left: 100%;
+        }
+
+        .animation-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px var(--shadow-base);
+        }
+
+        .animation-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .animation-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .animation-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Steps Section */
+        .steps-section {
+            padding: 6rem 2rem;
+            background: var(--card-bg); /* Use card background for glassmorphism */
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--card-border);
+            border-bottom: 1px solid var(--card-border);
+            margin-top: 4rem;
+            margin-bottom: 4rem;
+            border-radius: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: var(--shadow-base) 0px 20px 40px -12px;
+        }
+
+        .steps-container {
+            max-width: 100%; /* Adjust to fit padded section */
+            margin: 0 auto;
+        }
+
+        .steps-title {
+            text-align: center;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 4rem;
+            background: var(--secondary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .step-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px var(--shadow-base);
+        }
+
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 2rem;
+            background: var(--accent-gradient);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .step-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 1rem 0 1rem 0;
+            color: var(--text-primary);
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Try Now Section */
+        .try-now-section {
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            background: var(--card-bg); /* Use card background for glassmorphism */
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--card-border);
+            border-bottom: 1px solid var(--card-border);
+            margin-top: 4rem;
+            margin-bottom: 4rem;
+            border-radius: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: var(--shadow-base) 0px 20px 40px -12px;
+        }
+
+        .try-now-container {
+            max-width: 100%; /* Adjust to fit padded section */
+            margin: 0 auto;
+        }
+
+        .try-now-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 2rem;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .try-now-description {
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+
+        .try-now-btn {
+            background: var(--success-gradient);
+            color: white;
+            border: none;
+            padding: 1.5rem 3rem;
+            border-radius: 3rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 20px 40px rgba(17, 153, 142, 0.4);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .try-now-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .try-now-btn:hover::before {
+            left: 100%;
+        }
+
+        .try-now-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(17, 153, 142, 0.6);
+        }
+
+        /* Floating Try Button */
+        .floating-try-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(100px);
+            animation: slideInUp 0.6s ease forwards;
+            animation-delay: 2s;
+        }
+
+        @keyframes slideInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .floating-try-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--card-border);
+            padding: 3rem 2rem 1rem;
+            margin-top: 4rem; /* Add some margin above the footer */
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section p, .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            line-height: 1.6;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--text-primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--card-border);
+            color: var(--text-secondary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+
+            .logo {
+                margin-bottom: 1rem;
+            }
+
+            .nav-menu {
+                display: none; /* Hidden by default, will be toggled by JS if a hamburger menu is added */
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+                gap: 0.5rem;
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .theme-toggle {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+
+            .hero {
+                min-height: auto;
+                padding: 8rem 1rem 4rem;
+            }
+
+            .hero-title {
+                font-size: clamp(2.5rem, 8vw, 4rem);
+            }
+
+            .hero-subtitle {
+                font-size: clamp(1rem, 3vw, 1.25rem);
+                margin-bottom: 2rem;
+            }
+
+            .hero-features {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .intro-section, .steps-section, .try-now-section {
+                padding: 4rem 1rem;
+                margin: 2rem auto;
+            }
+
+            .intro-title, .steps-title, .try-now-title {
+                font-size: clamp(2rem, 5vw, 3rem);
+                margin-bottom: 2rem;
+            }
+
+            .intro-animation, .steps-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .step-number {
+                top: -10px;
+                left: 1rem;
+                width: 30px;
+                height: 30px;
+                font-size: 1rem;
+            }
+
+            .step-title {
+                margin-top: 0.5rem;
+            }
+
+            .footer-container {
+                flex-direction: column;
+                text-align: center;
+                gap: 2rem;
+            }
+
+            .footer-section {
+                margin-bottom: 0;
+            }
+
+            .floating-try-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 0.9rem;
+                bottom: 1.5rem;
+                right: 1.5rem;
+            }
+
+            .modal-content {
+                width: 90%;
+                padding: 1.5rem;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
+
+            .modal-btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                font-size: 0.9rem;
+            }
+
+            .nav-container {
+                padding: 0.75rem;
+            }
+
+            .hero-title {
+                font-size: clamp(2rem, 8vw, 3.5rem);
+            }
+
+            .intro-section, .steps-section, .try-now-section {
+                padding: 2rem 0.75rem;
+            }
+
+            .intro-title, .steps-title, .try-now-title {
+                font-size: clamp(1.8rem, 5vw, 2.5rem);
+            }
+
+            .animation-card, .step-card {
+                padding: 1.5rem;
+            }
+
+            .animation-icon {
+                font-size: 3rem;
+            }
+
+            .floating-try-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 0.8rem;
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+
+        /* Scroll Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Modal for Try Button */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 2rem;
+            margin: 15% auto;
+            padding: 3rem;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            animation: modalSlideIn 0.4s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-description {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .modal-btn {
+            background: var(--success-gradient);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 0.5rem;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .modal-btn.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+        }
+
+        .modal-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Light Theme Overrides */
+        body.light-theme .header {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .floating-particles .particle {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .animated-bg {
+            background: #f0f4f8; /* Solid color for light theme background */
+        }
+
+        body.light-theme .hero {
+            background: transparent; /* Keep transparent in light mode */
+        }
+
+        body.light-theme .intro-section,
+        body.light-theme .steps-section,
+        body.light-theme .try-now-section {
+            background: var(--light-card-bg);
+            border-top: 1px solid var(--light-card-border);
+            border-bottom: 1px solid var(--light-card-border);
+            box-shadow: var(--light-shadow-base) 0px 20px 40px -12px;
+        }
+
+        body.light-theme .hero-title {
+            background: linear-gradient(135deg, #1e293b, #64748b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.light-theme .intro-title {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.light-theme .steps-title {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.light-theme .try-now-title {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.light-theme .feature-badge, 
+        body.light-theme .animation-card, 
+        body.light-theme .step-card, 
+        body.light-theme .modal-content {
+            background: var(--light-card-bg);
+            border: 1px solid var(--light-card-border);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .feature-badge:hover, 
+        body.light-theme .animation-card:hover, 
+        body.light-theme .step-card:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .modal-btn.secondary {
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--light-text-secondary);
+        }
+
+        body.light-theme .modal-btn.secondary:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--light-text-primary);
+        }
+
+        body.light-theme .footer {
+            background: rgba(240, 244, 248, 0.9);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .footer-bottom {
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .theme-toggle {
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            color: #1e293b;
+        }
+
+        body.light-theme .theme-toggle:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg">
+        <div class="floating-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo">🎭 FaceRec Studio</div>
+            <ul class="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#try-now">Try Now</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle">🌓</button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1 class="hero-title animate-fade-in-down">Advanced AI Face Recognition</h1>
+            <p class="hero-subtitle animate-fade-in-up stagger-1">Powerful, accurate, and privacy-focused face matching technology powered by cutting-edge artificial intelligence</p>
+            <div class="hero-features">
+                <div class="feature-badge animate-fade-in-left stagger-2">🔥 Real-time Processing</div>
+                <div class="feature-badge animate-fade-in-right stagger-3">🎯 80% Accuracy</div>
+                <div class="feature-badge animate-fade-in-left stagger-4">⚡ Batch Processing</div>
+                <div class="feature-badge animate-fade-in-right stagger-5">🛡️ Privacy First</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Animated Intro Section -->
+    <section class="intro-section" id="features">
+        <div class="intro-container">
+            <h2 class="intro-title fade-in">How Face Recognition Works</h2>
+            <div class="intro-animation">
+                <div class="animation-card fade-in">
+                    <div class="animation-icon rotating-icon">📷</div>
+                    <h3 class="animation-title">Upload Reference</h3>
+                    <p class="animation-description">Start by uploading a clear reference image containing the face you want to find. Our AI analyzes facial features and creates a unique biometric template.</p>
+                </div>
+                <div class="animation-card fade-in">
+                    <div class="animation-icon pulse-animation">🔍</div>
+                    <h3 class="animation-title">AI Analysis</h3>
+                    <p class="animation-description">Advanced neural networks detect faces, extract key features like eyes, nose, mouth, and facial structure to create a comprehensive face signature.</p>
+                </div>
+                <div class="animation-card fade-in">
+                    <div class="animation-icon floating-animation">⚡</div>
+                    <h3 class="animation-title">Batch Processing</h3>
+                    <p class="animation-description">Upload multiple images or entire collections. Our system processes them efficiently in batches, comparing each face against your reference.</p>
+                </div>
+                <div class="animation-card fade-in">
+                    <div class="animation-icon rotating-icon">✨</div>
+                    <h3 class="animation-title">Smart Matching</h3>
+                    <p class="animation-description">Get precise confidence scores for each match. Adjust tolerance levels to find exact matches or similar faces based on your needs.</p>
+                </div>
+                <div class="animation-card fade-in">
+                    <div class="animation-icon pulse-animation">📊</div>
+                    <h3 class="animation-title">Results Analysis</h3>
+                    <p class="animation-description">Review detailed results with confidence scores, similarity metrics, and visual comparisons to validate matches.</p>
+                </div>
+                <div class="animation-card fade-in">
+                    <div class="animation-icon floating-animation">🔒</div>
+                    <h3 class="animation-title">Privacy Protection</h3>
+                    <p class="animation-description">Your data is processed locally and securely. No images are stored on our servers, ensuring complete privacy.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Steps Section -->
+    <section class="steps-section" id="how-it-works">
+        <div class="steps-container">
+            <h2 class="steps-title fade-in">Get Started in 4 Simple Steps</h2>
+            <div class="steps-grid">
+                <div class="step-card fade-in">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Upload Reference Face</h3>
+                    <p class="step-description">Drag and drop or click to upload a clear image of the person you want to find. Make sure the face is clearly visible and well-lit.</p>
+                </div>
+                <div class="step-card fade-in">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Add Image Collection</h3>
+                    <p class="step-description">Upload multiple images or entire folders containing photos you want to search through. Support for all major image formats.</p>
+                </div>
+                <div class="step-card fade-in">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Configure Settings</h3>
+                    <p class="step-description">Adjust the matching tolerance (how strict the matching should be) and batch size for optimal performance and accuracy.</p>
+                </div>
+                <div class="step-card fade-in">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title">Get Results</h3>
+                    <p class="step-description">View detailed results with confidence scores, sorted by accuracy. Download or share results as needed.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Try Now Section -->
+    <section class="try-now-section" id="try-now">
+        <div class="try-now-container">
+            <h2 class="try-now-title fade-in">Ready to Experience the Future?</h2>
+            <p class="try-now-description fade-in">Join thousands of users who trust our advanced face recognition technology for their projects and applications.</p>
+            <button class="try-now-btn fade-in" onclick="openTool()">🚀 Start Face Recognition</button>
+        </div>
+    </section>
+
+    <!-- Floating Try Button -->
+    <button class="floating-try-btn floating-animation" onclick="showModal()">Try Now</button>
+
+    <!-- Modal -->
+    <div class="modal" id="tryModal">
+        <div class="modal-content">
+            <h3 class="modal-title">Ready to Start?</h3>
+            <p class="modal-description">You're about to access our advanced face recognition tool. Make sure you have your reference image and image collection ready!</p>
+            <button class="modal-btn" onclick="openTool()">Open Tool</button>
+            <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>🎭 FaceRec Studio</h3>
+                <p>Advanced AI-powered face recognition and matching technology for professionals and enthusiasts.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Features</h3>
+                <p>• Real-time Processing</p>
+                <p>• High Accuracy Matching</p>
+                <p>• Batch Processing</p>
+                <p>• Privacy Protection</p>
+            </div>
+            <div class="footer-section">
+                <h3>Technology</h3>
+                <p>• Neural Networks</p>
+                <p>• Computer Vision</p>
+                <p>• Machine Learning</p>
+                <p>• Edge Computing</p>
+            </div>
+            <div class="footer-section">
+                <h3>Support</h3>
+                <p>• Documentation</p>
+                <p>• API Reference</p>
+                <p>• Community Forum</p>
+                <p>• Contact Support</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 FaceRec Studio. All rights reserved. | Privacy Policy | Terms of Service</p>
+        </div>
+    </footer>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+
+    <script>
+        // Enhanced scroll animations with intersection observer
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    // Add entrance animations for staggered elements
+                    const staggeredElements = entry.target.querySelectorAll('.stagger-1, .stagger-2, .stagger-3, .stagger-4, .stagger-5, .stagger-6');
+                    staggeredElements.forEach((el, index) => {
+                        setTimeout(() => {
+                            el.style.opacity = '1';
+                            el.style.transform = 'translateY(0)';
+                        }, index * 100);
+                    });
+                }
+            });
+        }, observerOptions);
+
+        // Observe all fade-in elements
+        document.addEventListener('DOMContentLoaded', function() {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            fadeElements.forEach(el => observer.observe(el));
+        });
+
+        // Legacy scroll animations for compatibility
+        function handleScrollAnimations() {
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('visible');
+                }
+            });
+        }
+
+        // Particle animation enhancement
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            
+            document.querySelector('.floating-particles').appendChild(particle);
+            
+            // Remove particle after animation
+            setTimeout(() => {
+                particle.remove();
+            }, 20000);
+        }
+
+        // Create particles periodically
+        setInterval(createParticle, 2000);
+
+        // Smooth scrolling for navigation with enhanced animation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    // Add smooth scroll with easing
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // Add highlight effect to target section
+                    target.style.transition = 'all 0.3s ease';
+                    target.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        target.style.transform = 'scale(1)';
+                    }, 300);
+                }
+            });
+        });
+
+        // Enhanced header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header');
+            const scrolled = window.pageYOffset;
+            const parallax = scrolled * 0.5;
+            
+            if (scrolled > 100) {
+                header.style.background = 'rgba(10, 10, 10, 0.95)';
+                header.style.backdropFilter = 'blur(20px)';
+            } else {
+                header.style.background = 'rgba(10, 10, 10, 0.8)';
+                header.style.backdropFilter = 'blur(10px)';
+            }
+            
+            // Parallax effect for hero section
+            const hero = document.querySelector('.hero');
+            if (hero) {
+                hero.style.transform = `translateY(${parallax}px)`;
+            }
+        });
+
+        // Enhanced modal functions with animations
+        function showModal() {
+            const modal = document.getElementById('tryModal');
+            modal.style.display = 'block';
+            modal.style.opacity = '0';
+            modal.style.transform = 'scale(0.8)';
+            
+            setTimeout(() => {
+                modal.style.opacity = '1';
+                modal.style.transform = 'scale(1)';
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('tryModal');
+            modal.style.opacity = '0';
+            modal.style.transform = 'scale(0.8)';
+            
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        function openTool() {
+            // Add loading animation
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.innerHTML = '<span class="loading-spinner"></span> Loading...';
+            btn.disabled = true;
+            
+            // Check if user is logged in
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            setTimeout(() => {
+                if (currentUser) {
+                    window.location.href = 'index.html';
+                } else {
+                    window.location.href = 'login.html';
+                }
+            }, 1000);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('tryModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Enhanced theme toggle function
+        function toggleTheme() {
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.style.transform = 'rotate(180deg)';
+            
+            setTimeout(() => {
+                if (document.body.classList.contains('dark-theme')) {
+                    document.body.classList.remove('dark-theme');
+                    document.body.classList.add('light-theme');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.body.classList.remove('light-theme');
+                    document.body.classList.add('dark-theme');
+                    localStorage.setItem('theme', 'dark');
+                }
+                themeToggle.style.transform = 'rotate(0deg)';
+            }, 150);
+        }
+
+        // Set initial theme based on local storage
+        function setInitialTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.body.classList.add(`${savedTheme}-theme`);
+            } else {
+                // Default to dark theme if no preference is saved
+                document.body.classList.add('dark-theme');
+            }
+        }
+
+        // Add hover effects for interactive elements
+        function addHoverEffects() {
+            const cards = document.querySelectorAll('.animation-card, .step-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            setInitialTheme();
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            
+            handleScrollAnimations();
+            window.addEventListener('scroll', handleScrollAnimations);
+            
+            addHoverEffects();
+            
+            // Add entrance animation to hero elements
+            setTimeout(() => {
+                const heroElements = document.querySelectorAll('.animate-fade-in-down, .animate-fade-in-up, .animate-fade-in-left, .animate-fade-in-right');
+                heroElements.forEach((el, index) => {
+                    setTimeout(() => {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }, index * 200);
+                });
+            }, 100);
+        });
+    </script>
+</body>
+</html> 
