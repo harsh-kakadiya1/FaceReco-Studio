@@ -5,6 +5,10 @@
 
 **Face Recognition Studio** is a modern, responsive web UI for an AI-powered face matching and recognition system. Designed with a sleek dark/light theme, animated backgrounds, and elegant glassmorphism styles, this front-end project simulates a face recognition platform with register/login support and dynamic UX.
 
+- A user uploads a reference image through a web interface.
+- The backend scans a large image dataset to find and copy all images containing the same face.
+- Face matching is performed using CPU-based Python face recognition (no GPU required).
+
 ---
 
 ## 🚀 Features
