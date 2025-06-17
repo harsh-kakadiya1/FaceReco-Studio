@@ -20,7 +20,12 @@
 - 💡 Light/Dark Theme support  
 - 🖼️ Drag-and-drop image upload areas  
 - 🔍 Stylish result preview cards with hover animations  
-- 📱 Responsive design for mobile and desktop devices  
+- 📱 Responsive design for mobile and desktop devices
+
+  ### Tolerance Settings Guide
+  - **0.4**: Very strict matching (identical twins might not match)
+  - **0.6**: Default - good balance of accuracy and recall
+  - **0.8**: More lenient (may include similar-looking people)
 
 ---
 
@@ -64,6 +69,7 @@
 
 ---
 
+  
 ## 📸 Preview
 
 > * link *
