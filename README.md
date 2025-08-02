@@ -1,7 +1,7 @@
 
 ---
 
-# 🎭 Face Recognition Studio
+# 🎭 [Face Recognition Studio](https://facerec-studio.netlify.app/home)
 
 **Face Recognition Studio** is a modern, responsive web UI for an AI-powered face matching and recognition system. Designed with a sleek dark/light theme, animated backgrounds, and elegant glassmorphism styles, this front-end project simulates a face recognition platform with register/login support and dynamic UX.
 
