@@ -1441,15 +1441,9 @@
             btn.innerHTML = '<span class="loading-spinner"></span> Loading...';
             btn.disabled = true;
             
-            // Check if user is logged in
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            
+            // Direct redirect to the face recognition tool
             setTimeout(() => {
-                if (currentUser) {
-                    window.location.href = 'index.html';
-                } else {
-                    window.location.href = 'login.html';
-                }
+                window.location.href = 'index.html';
             }, 1000);
         }
 

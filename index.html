@@ -16,10 +16,10 @@
             /* Dark Theme Colors */
             --bg-color: #0f172a;
             --card-bg: rgba(255, 255, 255, 0.95);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border-color: rgba(255, 255, 255, 0.2);
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.25);
             --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             --shadow-xl: 0 35px 60px -12px rgba(0, 0, 0, 0.3);
 
@@ -60,6 +60,21 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
+        }
+
+        /* Hide scrollbar for webkit browsers */
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for Firefox */
+        body {
+            scrollbar-width: none;
+        }
+
+        /* Hide scrollbar for IE and Edge */
+        body {
+            -ms-overflow-style: none;
         }
 
         /* Animated Background */
@@ -115,12 +130,40 @@
             margin: 0 auto;
             padding: 2rem;
             position: relative;
+            padding-top: 350px; /* Add space for fixed header */
         }
 
         .header {
             text-align: center;
             margin-bottom: 4rem;
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 2rem;
+            backdrop-filter: blur(0px);
+            background: rgba(15, 23, 42, 0);
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            backdrop-filter: blur(20px);
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+        }
+
+        .header.scrolled h1 {
+            font-size: 2rem;
+        }
+
+        .header.scrolled .subtitle {
+            display: none;
+        }
+
+        .header.scrolled .features {
+            display: none;
         }
 
         .header::before {
@@ -667,128 +710,6 @@
             visibility: visible;
         }
 
-        .logout-btn {
-            position: absolute;
-            top: 2rem;
-            right: 2rem;
-            background: rgba(245, 87, 108, 0.2);
-            color: #f5576c;
-            border: 1px solid rgba(245, 87, 108, 0.3);
-            padding: 0.75rem 1.5rem;
-            border-radius: 2rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            backdrop-filter: blur(10px);
-        }
-
-        .logout-btn:hover {
-            background: rgba(245, 87, 108, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .user-info {
-            position: absolute;
-            top: 2rem;
-            right: 8rem;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .account-dropdown {
-            position: absolute;
-            top: 2rem;
-            right: 0.5rem;
-            z-index: 1000;
-        }
-
-        .account-btn {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 0.75rem 1.5rem;
-            border-radius: 2rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .account-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .account-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            margin-top: 0.5rem;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-color);
-            border-radius: 1rem;
-            padding: 0.5rem;
-            min-width: 200px;
-            box-shadow: var(--shadow-lg);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-        }
-
-        .account-menu.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .account-menu-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .account-menu-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-        }
-
-        .account-menu-item.logout {
-            color: #f5576c;
-            border-top: 1px solid var(--border-color);
-            margin-top: 0.5rem;
-        }
-
-        .account-menu-item.logout:hover {
-            background: rgba(245, 87, 108, 0.1);
-        }
-
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--primary-gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: white;
-            font-size: 0.8rem;
-        }
-
         /* Theme Toggle Button */
         .theme-toggle {
             position: absolute;
@@ -827,6 +748,18 @@
             color: var(--light-text-secondary);
         }
 
+        body.light-theme .header h1 {
+            background: linear-gradient(135deg, #1e293b, #475569);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.light-theme .header.scrolled {
+            background: rgba(240, 244, 248, 0.9);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
         body.light-theme .feature-badge {
             background: var(--light-glass-bg);
             border: 1px solid var(--light-border-color);
@@ -835,6 +768,39 @@
 
         body.light-theme .feature-badge:hover {
             background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Dark theme specific overrides for better visibility */
+        body.dark-theme .card {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        body.dark-theme .card h2 {
+            color: #ffffff;
+        }
+
+        body.dark-theme .feature-badge {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        body.dark-theme .feature-badge:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        body.dark-theme .upload-area {
+            color: #e2e8f0;
+            border: 3px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        body.dark-theme .settings-group label {
+            color: #f1f5f9;
+        }
+
+        body.dark-theme .current-value {
+            color: #94a3b8;
         }
 
         body.light-theme .card {
@@ -979,39 +945,6 @@
         body.light-theme .tooltip::after {
             background: var(--light-text-primary);
             color: white;
-        }
-
-        body.light-theme .account-dropdown .account-btn {
-            background: var(--light-glass-bg);
-            border: 1px solid var(--light-border-color);
-            color: var(--light-text-primary);
-        }
-
-        body.light-theme .account-dropdown .account-btn:hover {
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        body.light-theme .account-dropdown .account-menu {
-            background: var(--light-glass-bg);
-            border: 1px solid var(--light-border-color);
-        }
-
-        body.light-theme .account-dropdown .account-menu-item {
-            color: var(--light-text-secondary);
-        }
-
-        body.light-theme .account-dropdown .account-menu-item:hover {
-            background: rgba(0, 0, 0, 0.05);
-            color: var(--light-text-primary);
-        }
-
-        body.light-theme .account-dropdown .account-menu-item.logout {
-            color: #d63031;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        body.light-theme .account-dropdown .account-menu-item.logout:hover {
-            background: rgba(214, 48, 49, 0.1);
         }
 
         @media (max-width: 768px) {
@@ -1266,27 +1199,6 @@
                 <div class="feature-badge">⚡ Batch Processing</div>
                 <div class="feature-badge">🛡️ Privacy First</div>
             </div>
-            <div class="account-dropdown">
-                <button class="account-btn" onclick="toggleAccountMenu()">
-                    <div class="user-avatar" id="userAvatar"></div>
-                    <span id="userName">User</span>
-                    <span>▼</span>
-                </button>
-                <div class="account-menu" id="accountMenu">
-                    <div class="account-menu-item">
-                        <span>👤</span>
-                        <span>Profile</span>
-                    </div>
-                    <div class="account-menu-item">
-                        <span>⚙️</span>
-                        <span>Settings</span>
-                    </div>
-                    <div class="account-menu-item logout" onclick="logout()">
-                        <span>🚪</span>
-                        <span>Logout</span>
-                    </div>
-                </div>
-            </div>
             <button class="theme-toggle" id="themeToggle">🌓</button>
         </div>
 
@@ -1349,12 +1261,6 @@
     </div>
 
     <script>
-        // Authentication check
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (!currentUser) {
-            window.location.href = 'login.html';
-        }
-
         // State management
         let referenceImage = null;
         let collectionImages = [];
@@ -1625,24 +1531,30 @@
         document.addEventListener('DOMContentLoaded', function() {
             setInitialTheme(); // Set theme on load
             document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-
-            // Display user name and avatar
-            const userName = document.getElementById('userName');
-            const userAvatar = document.getElementById('userAvatar');
-            if (currentUser) {
-                if (userName) {
-                    userName.textContent = `${currentUser.firstName} ${currentUser.lastName}`;
-                }
-                if (userAvatar) {
-                    const initials = `${currentUser.firstName.charAt(0)}${currentUser.lastName.charAt(0)}`.toUpperCase();
-                    userAvatar.textContent = initials;
-                }
-            }
             
             initializeEventListeners();
             updateToleranceValue();
             updateBatchSizeValue();
+            
+            // Add scroll effect for header
+            handleHeaderScroll();
         });
+
+        // Header scroll effect
+        function handleHeaderScroll() {
+            const header = document.querySelector('.header');
+            
+            window.addEventListener('scroll', function() {
+                const scrolled = window.pageYOffset;
+                const threshold = 100; // Pixels to scroll before effect kicks in
+                
+                if (scrolled > threshold) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+        }
 
         // Theme toggle functions
         function toggleTheme() {
@@ -1665,28 +1577,6 @@
                 // Default to dark theme if no preference is saved
                 document.body.classList.add('dark-theme');
             }
-        }
-
-        // Account dropdown functions
-        function toggleAccountMenu() {
-            const menu = document.getElementById('accountMenu');
-            menu.classList.toggle('show');
-        }
-
-        // Close account menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const dropdown = document.querySelector('.account-dropdown');
-            const menu = document.getElementById('accountMenu');
-            
-            if (!dropdown.contains(event.target) && menu.classList.contains('show')) {
-                menu.classList.remove('show');
-            }
-        });
-
-        // Logout function
-        function logout() {
-            localStorage.removeItem('currentUser');
-            window.location.href = 'home.html';
         }
     </script>
 </body>
