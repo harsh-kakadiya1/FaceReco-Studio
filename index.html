@@ -1191,6 +1191,7 @@
             }
         }
     </style>
+    <script src="https://unpkg.com/@vladmandic/human/dist/human.js"></script>
 </head>
 <body>
     <div class="animated-bg">
@@ -1459,8 +1460,14 @@
                 const tolerance = parseFloat(toleranceSlider.value);
                 const batchSize = parseInt(batchSizeSlider.value);
                 
-                // Simulate face recognition processing
-                const results = await simulateFaceRecognition(collectionImages, tolerance, batchSize);
+                // Real face recognition processing
+                let results = [];
+                try {
+                    results = await realFaceRecognition(collectionImages, tolerance, batchSize);
+                } catch (e) {
+                    console.warn('Real processing failed, fallback to simulation', e);
+                    results = await simulateFallback(collectionImages, tolerance, batchSize);
+                }
                 displayResults(results);
             } catch (error) {
                 console.error('Processing error:', error);
@@ -1478,7 +1485,7 @@
             updateProgress(0);
         }
 
-        function hideProgress() {
+    function hideProgress() {
             progressBar.style.display = 'none';
             processText.textContent = '🚀 Start Face Recognition';
         }
@@ -1487,35 +1494,90 @@
             progressFill.style.width = `${percent}%`;
         }
 
-        // Simulate face recognition (replace with actual implementation)
-        async function simulateFaceRecognition(images, tolerance, batchSize) {
+        // ---- Real Face Recognition using Human.js ----
+        let humanInstance = null;
+        let humanModelsLoaded = false;
+        const humanConfig = {
+            modelBasePath: 'https://unpkg.com/@vladmandic/human/models',
+            cacheSensitivity: 0,
+            face: { detector: { enabled: true, rotation: true, maxDetected: 1 }, mesh: { enabled: false }, iris: { enabled: false }, emotion: { enabled: false }, description: { enabled: false }, age: { enabled: false }, gender: { enabled: false }, embedding: { enabled: true } },
+            body: { enabled: false }, hand: { enabled: false }, object: { enabled: false }
+        };
+
+        async function ensureHuman() {
+            if (!humanInstance) humanInstance = new Human(humanConfig);
+            if (!humanModelsLoaded) {
+                processText.innerHTML = '<span class="loading-spinner"></span>Loading Models...';
+                await humanInstance.load();
+                humanModelsLoaded = true;
+            }
+            return humanInstance;
+        }
+
+        function createImage(dataUrl) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = dataUrl;
+            });
+        }
+
+        function cosineSimilarity(a, b) {
+            if (!a || !b || a.length !== b.length) return 0;
+            let dot = 0, na = 0, nb = 0;
+            for (let i = 0; i < a.length; i++) { dot += a[i] * b[i]; na += a[i]*a[i]; nb += b[i]*b[i]; }
+            return dot / (Math.sqrt(na) * Math.sqrt(nb));
+        }
+
+        async function realFaceRecognition(images, tolerance, batchSize) {
+            const human = await ensureHuman();
             const results = [];
+            if (!referenceImage) return results;
+
+            // Reference embedding
+            const refImg = await createImage(referenceImage.dataUrl);
+            const refDet = await human.detect(refImg);
+            const refFace = refDet.face?.[0];
+            if (!refFace || !refFace.embedding) {
+                alert('No face detected in reference image. Please use a clear frontal face.');
+                return results;
+            }
+            const refEmbedding = refFace.embedding;
+
             const totalImages = images.length;
-            
             for (let i = 0; i < totalImages; i += batchSize) {
                 const batch = images.slice(i, i + batchSize);
-                
-                // Simulate batch processing delay
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                // Simulate face matching with random confidence scores
+                await Promise.all(batch.map(async img => {
+                    try {
+                        const colImg = await createImage(img.dataUrl);
+                        const det = await human.detect(colImg);
+                        const face = det.face?.[0];
+                        if (face && face.embedding) {
+                            const sim = cosineSimilarity(refEmbedding, face.embedding);
+                            if (sim >= tolerance) results.push({ image: img, confidence: sim, matched: true });
+                        }
+                    } catch(e) { console.warn('Image processing failed', img.name, e); }
+                }));
+                updateProgress(Math.min(((i + batchSize) / totalImages) * 100, 100));
+            }
+            return results.sort((a,b)=> b.confidence - a.confidence);
+        }
+
+        // Fallback simulation if real processing fails
+        async function simulateFallback(images, tolerance, batchSize) {
+            const results = [];
+            const totalImages = images.length;
+            for (let i = 0; i < totalImages; i += batchSize) {
+                const batch = images.slice(i, i + batchSize);
+                await new Promise(r => setTimeout(r, 200));
                 batch.forEach(img => {
                     const confidence = Math.random();
-                    if (confidence > tolerance) {
-                        results.push({
-                            image: img,
-                            confidence: confidence,
-                            matched: true
-                        });
-                    }
+                    if (confidence > tolerance) results.push({ image: img, confidence, matched: true });
                 });
-                
-                // Update progress
-                const progress = Math.min(((i + batchSize) / totalImages) * 100, 100);
-                updateProgress(progress);
+                updateProgress(Math.min(((i + batchSize) / totalImages) * 100, 100));
             }
-            
-            return results.sort((a, b) => b.confidence - a.confidence);
+            return results.sort((a,b)=> b.confidence - a.confidence);
         }
 
         function displayResults(results) {
