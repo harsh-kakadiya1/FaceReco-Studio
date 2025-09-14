@@ -34,8 +34,6 @@
 
 📦 Face-Recognition-Studio
 - ├── index.html        # Main landing page with image upload & feature cards
-- ├── login.html        # Secure login form with OTP verification
-- ├── register.html     # User registration page with styled inputs
 - ├── home.html         # Home/dashboard page with animated hero sections
 
 
